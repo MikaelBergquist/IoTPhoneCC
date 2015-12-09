@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +44,15 @@ public class MainActivity extends AppCompatActivity implements
 
         TextView tv = (TextView) findViewById(R.id.text2);
         tv.setText(count + "");
+        Button img = (Button) findViewById(R.id.button);
+        img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                increaseCounter();
+                increaseCounter();
 
+            }
+        });
         //Google API klient som behövs för att skicka data till det speciella molnet.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -70,7 +81,14 @@ public class MainActivity extends AppCompatActivity implements
 //        i.putExtra("KEY1", "Value to be used by the service");
 //        context.startService(i);
     }
-
+    private void increaseCounter() {
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/count");
+        putDataMapReq.setUrgent();
+        putDataMapReq.getDataMap().putInt(COUNT_KEY, count++);
+        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+        PendingResult<DataApi.DataItemResult> pendingResult =
+                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
+    }
     @Override
     public void onConnected(Bundle bundle) {
         Toast.makeText(MainActivity.this, "connected",Toast.LENGTH_SHORT);

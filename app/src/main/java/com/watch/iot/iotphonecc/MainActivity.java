@@ -1,18 +1,23 @@
 package com.watch.iot.iotphonecc;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 public class MainActivity extends AppCompatActivity implements
@@ -34,36 +39,42 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        TextView tv = (TextView) findViewById(R.id.text2);
+        tv.setText(count + "");
 
         //Google API klient som behövs för att skicka data till det speciella molnet.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle connectionHint) {
-                        Log.d(TAG, "onConnected: " + connectionHint);
-                        // Now you can use the Data Layer API
-                    }
-                    @Override
-                    public void onConnectionSuspended(int cause) {
-                        Log.d(TAG, "onConnectionSuspended: " + cause);
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult result) {
-                        Log.d(TAG, "onConnectionFailed: " + result);
-                    }
-                })
-                        // Request access only to the Wearable API
+                .addConnectionCallbacks(this)
+//                {
+//                    @Override
+//                    public void onConnected(Bundle connectionHint) {
+//                        Log.d(TAG, "onConnected: " + connectionHint);
+//                        // Now you can use the Data Layer API
+//                    }
+//                    @Override
+//                    public void onConnectionSuspended(int cause) {
+//                        Log.d(TAG, "onConnectionSuspended: " + cause);
+//                    }
+//                })
+//                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+//                    @Override
+//                    public void onConnectionFailed(ConnectionResult result) {
+//                        Log.d(TAG, "onConnectionFailed: " + result);
+//                    }
+//                })
+//                        // Request access only to the Wearable API
                 .addApi(Wearable.API)
                 .build();
-        mGoogleApiClient.connect();
 
+//// potentially add data to the intent
+//        i.putExtra("KEY1", "Value to be used by the service");
+//        context.startService(i);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
+        Toast.makeText(MainActivity.this, "connected",Toast.LENGTH_SHORT);
+
         Wearable.DataApi.addListener(mGoogleApiClient, this);
     }
 
@@ -74,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        Wearable.DataApi.addListener(mGoogleApiClient, this);
         mGoogleApiClient.connect();
     }
     @Override
@@ -108,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements
     //method to update count
     private void updateCount(int c){
         count = c;
-        Toast.makeText(MainActivity.this, "nytt värde:" + count, Toast.LENGTH_LONG).show();
+        TextView tv = (TextView) findViewById(R.id.text2);
+        tv.setText(count+"");
+        Toast.makeText(MainActivity.this,"nytt värde:"+count,Toast.LENGTH_SHORT);
     }
 }
